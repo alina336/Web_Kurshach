@@ -1,0 +1,196 @@
+body {
+	background: #f9e933; 
+	font-family: 'Droid sans';
+	font-size: 100%;
+}
+
+
+a {
+	text-decoration: none;
+	color: red;
+}
+
+a:hover {
+	text-decoration: underline;
+	color: red;
+}
+
+h1, h2, h3, h4 {
+	font-family: Ubuntu;
+	font-size: 120%;
+}
+
+header, main, footer { 
+	min-width: 855px;
+}
+
+header .container, main .container, footer .container { 
+	max-width: 855px;
+	margin: auto;
+}
+
+header { 
+	background: white; 
+	overflow: auto;
+	margin-bottom: 3px;
+	padding: 10px;
+	transition: color 0.2s linear;
+
+}
+header h1 {
+	float: left;
+	width: 570px;
+}
+header nav {
+	float: right;
+	width: 285px;
+}
+main { 
+	background: white; 
+	overflow: auto;
+	padding: 20px;
+}
+
+main .image {
+	float: right;	
+	width: 290px;
+
+}
+
+main .faq {
+	float: left;
+	width: 855px;
+}
+
+main .faq p {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+main h2 {
+	font-size: 120%;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+main h3 {
+	margin-top: 10px;
+	margin-bottom: 5px;	
+}
+
+footer {
+	overflow: auto;
+	padding: 10px;
+}
+
+footer .contact {
+	float: left;
+	width: 570px;
+}
+ 
+footer .sitemap {
+	float: right;	
+	width: 285px;
+}
+
+.tabs a span {
+display: inline-block;
+border-radius: 5px 5px 0 0;
+width: 100px;
+margin-right: 10px;
+text-align: center;
+background: #ddd;
+padding: 5px;
+}
+
+.tabs a span.active {
+background: #eee;
+}
+
+.content {
+	background: white;
+	padding-bottom: 10px;
+}
+
+.content li{
+	list-style: none;
+	margin:  10px;
+	padding-left: 5px;
+	box-shadow: 0 0 0 10px #ddd;
+}
+
+.tops{
+	margin-bottom: 10px;
+}
+
+.container .faq{
+	width: 550px;
+}
+
+.container .tabs{
+	width: 550px;
+}
+
+.container .content{
+	width: 550px;
+}
+
+.contact h5{
+    padding-bottom: 10px;
+}
+
+.sitemap h5{
+	padding-bottom: 10px;
+}
+
+.content input {
+	width: 85%;
+	height: 36px;
+	margin: 10px;
+	font-family: Jura;
+	text-align: justify;
+	font-size:  24px;
+	box-shadow: 0 0 0 10px #ddd;
+}
+.content button {
+	height: 40px;
+	width: 11%;
+	min-width: 90px;
+	font-size: 16px;
+	margin:10px;
+	font-family: Ubuntu;
+	background: white;
+	box-shadow: 0 -3px 0 11px #ddd;
+}
+
+* {
+margin: 0;
+padding: 0;
+}
+
+.comments p:nth-child(even) {
+background: lavender;
+}
+.comments p:nth-child(odd) {
+background: gainsboro;
+}
+.comments p{
+border-radius: 30px;
+}
+
+.tocomment{
+	padding-left: 320px;
+}
+
+.comment-input{
+	width: 200px;
+	float: left;
+}
+
+.comments{
+	padding-left: 200px;
+	padding-top: 18px;
+	word-break:break-all;
+	width: 500px;
+}
+
