@@ -1,6 +1,6 @@
 var organizeByTags = function (toDoObjects) {
 
-	console.log("organizeByTags called");
+	// console.log("organizeByTags called");
 	// создание пустого массива для тегов
 	var tags = [];
 	// перебираем все задачи toDos
@@ -13,7 +13,7 @@ var organizeByTags = function (toDoObjects) {
 			}
 		});
 	});
-	console.log(tags);
+	// console.log(tags);
 
 	var tagObjects = tags.map(function (tag) {
 		// здесь мы находим все задачи, содержащие этот тег
@@ -27,7 +27,7 @@ var organizeByTags = function (toDoObjects) {
 		// мы связываем каждый тег с объектом, который  содержит название тега и массив
 		return { "name": tag, "toDos": toDosWithTag };
 	});
-	console.log(tagObjects);
+	// console.log(tagObjects);
 	return tagObjects;
 };
 
@@ -84,58 +84,39 @@ var main = function (toDoObjects) {
 					$tagInput = $("<input>").addClass("tags"),
 					$tagLabel = $("<p>").text("Тэги: "),
 					$button = $("<button>").text("+");
+					$("main .content").append($inputLabel).append($input).append($tagLabel).append($tagInput).append($button); 
+
+					function btnfunc() {
+						var description = $input.val(),
+							// разделение в соответствии с запятыми
+							tags = $tagInput.val().split(","), 
+							newToDo = {"description":description, "tags":tags};
+							$.post("todos", newToDo, function(result) {
+								console.log(result);
+								// нужно отправить новый объект на клиент  после получения ответа сервера
+								toDoObjects.push(newToDo);
+								// обновляем toDos
+								toDos = toDoObjects.map(function (toDo) {
+									return toDo.description;
+								});
+								$input.val("");
+								$tagInput.val("");
+							});
+					}
 
 					$button.on("click", function () {
-						if (($input.val() !== "") && (($input.val()).trim().length > 0)) {
-							var description = $input.val(),
-							// разделение в соответствии с запятыми
-							tags = $tagInput.val().split(","); 
-							toDoObjects.push({"description":description, "tags":tags}); 
-							// обновление toDos
-							toDos = toDoObjects.map(function (toDo) {
-								return toDo.description;
-							});
-							$input.val("");
-							$tagInput.val("");
-						}
+						if (($input.val() !== "") && (($input.val()).trim().length > 0)) { btnfunc(); }
 					});
-
 					$input.keypress(function(event) {
 						if (($input.val() !== "") && (($input.val()).trim().length > 0)) {
-							if (event.which == 13) {
-								var description = $input.val(),
-								// разделение в соответствии с запятыми
-								tags = $tagInput.val().split(","); 
-								toDoObjects.push({"description":description, "tags":tags}); 
-								// обновление toDos
-								toDos = toDoObjects.map(function (toDo) {
-									return toDo.description;
-								});
-								$input.val("");
-								$tagInput.val("");
-							}
+							if (event.which == 13) { btnfunc(); }
 						}
 					});
-
 					$tagInput.keypress(function(event) {
 						if (($input.val() !== "") && (($input.val()).trim().length > 0) && ($tagInput.val() !== "") && ($tagInput.val()).trim().length > 0) {
-							if (event.which == 13) {
-								var description = $input.val(),
-								// разделение в соответствии с запятыми
-								tags = $tagInput.val().split(","); 
-								toDoObjects.push({"description":description, "tags":tags}); 
-								// обновление toDos
-								toDos = toDoObjects.map(function (toDo) {
-									return toDo.description;
-								});
-								$input.val("");
-								$tagInput.val("");
-							}
+							if (event.which == 13) { btnfunc(); }
 						}
-					});
-
-					$("main .content").append($inputLabel).append($input).append($tagLabel).append($tagInput).append($button); 
-		
+					});		
 				}
 				return false;
 			})
@@ -165,7 +146,7 @@ var main = function (toDoObjects) {
 	});
 };
 $(document).ready(function () {
-	$.getJSON("js/todos.json", function (toDoObjects) {
+	$.getJSON("todos.json", function (toDoObjects) {
 	// вызов функции main с аргументом в виде объекта toDoObjects 
 		main(toDoObjects);
 	});
