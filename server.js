@@ -24,6 +24,9 @@ http.createServer(app).listen(3000);
 
 app.use(express.static(__dirname + "/client"));
 app.get("/todos.json", ToDosController.index);
+// базовые маршруты CRUD 
+app.get("/todos/:id", ToDosController.show); 
+app.post("/todos", ToDosController.create);
 
 // этот маршрут замещает наш файл todos.json в примере из части 5 
 app.get("/todos.json", function (req, res) { 
