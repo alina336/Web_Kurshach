@@ -1,6 +1,4 @@
 var organizeByTags = function (toDoObjects) {
-
-	// console.log("organizeByTags called");
 	// создание пустого массива для тегов
 	var tags = [];
 	// перебираем все задачи toDos
@@ -13,8 +11,6 @@ var organizeByTags = function (toDoObjects) {
 			}
 		});
 	});
-	// console.log(tags);
-
 	var tagObjects = tags.map(function (tag) {
 		// здесь мы находим все задачи, содержащие этот тег
 		var toDosWithTag = [];
@@ -30,6 +26,28 @@ var organizeByTags = function (toDoObjects) {
 	// console.log(tagObjects);
 	return tagObjects;
 };
+
+var liaWithDeleteOnClick = function(todo) {
+	var $todoListItem = $("<li>").text(todo),
+		$todoRemoveLink = $("<a>").attr("href", "./todos/" + todo._id);
+	$todoRemoveLink.text("Удалить");
+	console.log("todoListItem: " + todo);
+	console.log("todo._id: " + todo._id);
+	console.log("todo.description: " + todo.description);
+	$todoRemoveLink.on("click", function () {
+		$.ajax({
+			"url": "todos/" + todo._id,
+			"type": "DELETE"
+		}).done(function (responde) {
+			$(".tabs a:first-child span").trigger("click");
+		}).fail(function (err) {
+			console.log("error on delete 'todo'!");
+		});
+		return false;
+	});
+	$todoListItem.append($todoRemoveLink);
+	return $todoListItem;
+}
 
 var main = function (toDoObjects) { 
 	"use strict";
@@ -53,7 +71,9 @@ var main = function (toDoObjects) {
 				$("main .content").empty();
 				if ($element.parent().is(":nth-child(1)")) {
 					for (var i = toDos.length-1; i > -1; i--) { 
-						$(".content").append($("<li>").text(toDos[i]));
+						var $todoListItem = liaWithDeleteOnClick(toDos[i]);
+						$(".content").append($todoListItem);
+						// $(".content").append($("<li>").text(toDos[i]));
 					}
 				} 
 				else if ($element.parent().is(":nth-child(2)")) {
