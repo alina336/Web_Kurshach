@@ -28,10 +28,10 @@ var organizeByTags = function (toDoObjects) {
 };
 
 var liaWithEditOrDeleteOnClick = function (todo, callback) {
-	var $todoListItem = $("<li>").text(todo),
+	var $todoListItem = $("<li>").text(todo.description),
 		$todoEditLink = $("<a>").attr("href", "todos/" + todo._id),
 		$todoRemoveLink = $("<a>").attr("href", "todos/" + todo._id);
-
+		console.log("todo: " + todo.description);
 		$todoEditLink.addClass("linkEdit");
 		$todoRemoveLink.addClass("linkRemove");
 	
@@ -39,7 +39,7 @@ var liaWithEditOrDeleteOnClick = function (todo, callback) {
 		$todoRemoveLink.on("click", function () {
 			$.ajax({
 				url: "/todos/" + todo._id,
-				type: "DELETE",
+				type: "DELETE"
 			}).done(function (responde) {
 				callback();
 			}).fail(function (err) {
