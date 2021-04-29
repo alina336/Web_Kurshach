@@ -27,11 +27,28 @@ var organizeByTags = function (toDoObjects) {
 	return tagObjects;
 };
 
-var liaWithEditOrDeleteOnClick = function (todo) {
+var liaWithEditOrDeleteOnClick = function (todo, callback) {
 	var $todoListItem = $("<li>").text(todo),
 		$todoEditLink = $("<a>").attr("href", "todos/" + todo._id),
 		$todoRemoveLink = $("<a>").attr("href", "todos/" + todo._id);
 
+		$todoEditLink.addClass("linkEdit");
+		$todoRemoveLink.addClass("linkRemove");
+	
+		$todoRemoveLink.text("Удалить");
+		$todoRemoveLink.on("click", function () {
+			$.ajax({
+				url: "/todos/" + todo._id,
+				type: "DELETE",
+			}).done(function (responde) {
+				callback();
+			}).fail(function (err) {
+				console.log("error on delete 'todo'!");
+			});
+			return false;
+		});
+		$todoListItem.append($todoRemoveLink);
+		
 	$todoEditLink.text(" Редактировать");
 	$todoEditLink.on("click", function() {
 		var newDescription = prompt("Введите новое наименование для задачи", todo);
@@ -41,7 +58,7 @@ var liaWithEditOrDeleteOnClick = function (todo) {
 				"type": "PUT",
 				"data": { "description": newDescription },
 			}).done(function (responde) {
-				$(".tabs a:nth-child(2) span").trigger("click");
+				callback();
 			}).fail(function (err) {
 				console.log("Произошла ошибка: " + err);
 			});
@@ -50,19 +67,6 @@ var liaWithEditOrDeleteOnClick = function (todo) {
 	});
 	$todoListItem.append($todoEditLink);
 
-	$todoRemoveLink.text(" Удалить");
-	$todoRemoveLink.on("click", function () {
-		$.ajax({
-			url: "/todos/" + todo._id,
-			type: "DELETE",
-		}).done(function (responde) {
-			$(".tabs a:first-child span").trigger("click");
-		}).fail(function (err) {
-			console.log("error on delete 'todo'!");
-		});
-		return false;
-	});
-	$todoListItem.append($todoRemoveLink);
 	return $todoListItem;
 }
 
@@ -88,7 +92,12 @@ var main = function (toDoObjects) {
 				$("main .content").empty();
 				if ($element.parent().is(":nth-child(1)")) {
 					for (var i = toDos.length-1; i > -1; i--) { 
-						var $todoListItem = liaWithEditOrDeleteOnClick(toDos[i]);
+						// var $todoListItem = liaWithEditOrDeleteOnClick(toDos[i]);
+
+						var $todoListItem = liaWithEditOrDeleteOnClick(toDoObjects[i], function() {
+							$(".tabs a:first-child span").trigger("click");
+						});
+
 						$(".content").append($todoListItem);
 						// $(".content").append($("<li>").text(toDos[i]));
 					}
@@ -96,7 +105,12 @@ var main = function (toDoObjects) {
 				else if ($element.parent().is(":nth-child(2)")) {
 					$content = $("<ul>");
 					toDos.forEach(function (todo) {
-						var $todoListItem = liaWithEditOrDeleteOnClick(toDos);
+						// var $todoListItem = liaWithEditOrDeleteOnClick(toDos);
+
+						var $todoListItem = liaWithEditOrDeleteOnClick(toDoObjects[i], function() {
+							$(".tabs a:nth-child(2) span").trigger("click");
+						});
+
 						$(".content").append($todoListItem);
 							// $content.append($("<li>").text(todo));
 					});
@@ -130,6 +144,7 @@ var main = function (toDoObjects) {
 							// разделение в соответствии с запятыми
 							tags = $tagInput.val().split(","), 
 							newToDo = {"description":description, "tags":tags};
+							// newToDo = {"description":description, "tags":tags, "username":null};
 							$.post("todos", newToDo, function(result) {
 								console.log(result);
 								// нужно отправить новый объект на клиент  после получения ответа сервера

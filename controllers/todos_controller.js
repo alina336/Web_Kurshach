@@ -36,6 +36,10 @@ ToDosController.create = function (req, res) {
 		"description": req.body.description,
 		"tags": req.body.tags
 	});
+	
+	console.log("username: " + username);
+
+
 	User.find({"username": username}, function (err, result) {
 		if (err) {
 			res.send(500);
@@ -57,6 +61,7 @@ ToDosController.create = function (req, res) {
 			});
 		}
 	});
+
 };
 
 ToDosController.show = function (req, res) {
