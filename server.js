@@ -7,8 +7,6 @@ var express = require('express'),
     mongoose = require("mongoose"),
     app = express();
 
-app.use(express.static(__dirname + "/client")); 
-app.use(express.urlencoded());
 
 // начинаем слушать запросы
 http.createServer(app).listen(3000);

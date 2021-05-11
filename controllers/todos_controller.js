@@ -74,6 +74,7 @@ ToDosController.show = function (req, res) {
 	ToDo.find({"_id":id}, function (err, todo) {
 		if (err !== null) {
 			// возвращаем внутреннюю серверную ошибку 
+			console.log("ОШИБКА ТУТ");
 			res.status(500).json(err);
 		} else {
 			if (todo.length > 0) {
