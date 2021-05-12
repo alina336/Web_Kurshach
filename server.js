@@ -1,10 +1,11 @@
 var express = require('express'), 
     http = require("http"),
-	// импорт представления ToDoController
-	ToDosController = require("./controllers/todos_controller.js"),
+	// импорт представления MealController
+	MealsController = require("./controllers/meals_controller.js"),
 	UsersController = require("./controllers/users_controller.js"),
     // импортируем библиотеку mongoose
     mongoose = require("mongoose"),
+	database = 'Cafe'; //название хранилища в Mongo
     app = express();
 
 
@@ -18,7 +19,7 @@ app.use('/user/:username',express.static(__dirname + "/client"));
 app.use(express.urlencoded({ extended: true }));
 
 // подключаемся к хранилищу данных Amazeriffic в Mongo
-mongoose.connect('mongodb://localhost/amazeriffic', {
+mongoose.connect('mongodb://localhost/' + database, {
 		useNewUrlParser: true,
 		useCreateIndex: true,
 		useUnifiedTopology: true 
@@ -28,16 +29,16 @@ mongoose.connect('mongodb://localhost/amazeriffic', {
 	console.log(Error, err.message);
 });
 
-app.get("/todos.json", ToDosController.index);
-app.get("/todos/:id", ToDosController.show); 
-app.post("/todos", ToDosController.create);
-app.put("/todos/:id", ToDosController.update);
-app.delete("/todos/:id", ToDosController.destroy);
+app.get("/meals.json", MealsController.index);
+app.get("/meals/:id", MealsController.show); 
+app.post("/meals", MealsController.create);
+app.put("/meals/:id", MealsController.update);
+app.delete("/meals/:id", MealsController.destroy);
 
-app.get("/users/:username/todos.json", ToDosController.index);
-app.post("/users/:username/todos", ToDosController.create);
-app.put("/users/:username/todos/:id", ToDosController.update);
-app.delete("/users/:username/todos/:id", ToDosController.destroy);
+app.get("/users/:username/meals.json", MealsController.index);
+app.post("/users/:username/meals", MealsController.create);
+app.put("/users/:username/meals/:id", MealsController.update);
+app.delete("/users/:username/meals/:id", MealsController.destroy);
 
 app.get("/users.json", UsersController.index); 
 app.post("/users", UsersController.create); 

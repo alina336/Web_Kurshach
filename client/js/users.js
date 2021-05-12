@@ -33,6 +33,7 @@ var main = function (UsersObjects) {
 		var username = $input.val();
 		if (username !== null && username.trim() !== "") {
 			var loginUser = {"username": username};
+			Cookies.set('CurrentUser', username);
 			$.ajax({
 				'url': '/users/'+username,
 				'type': 'GET'

@@ -1,7 +1,7 @@
 // обратите внимание на то, что нужно перейти в папку, 
 // в которой находится каталог models
 var User = require("../models/user.js"), 
-	ToDo = require("../models/todo.js"),
+	Meal = require("../models/meal.js"),
 	UsersController = {},
 	mongoose = require("mongoose");
 
@@ -90,8 +90,8 @@ UsersController.destroy = function (req, res) {
             console.log(err);
             res.send(500, err);
         } else if (result.length !== 0) {
-        	console.log("Удаляем все todo с 'owner': " + result[0]._id);
-        	ToDo.deleteMany({"owner": result[0]._id}, function (err, todo) {
+        	console.log("Удаляем все meal с 'owner': " + result[0]._id);
+        	Meal.deleteMany({"owner": result[0]._id}, function (err, meal) {
 		        console.log("Удаляем пользователя");
 				User.deleteOne({"username": username}, function (err, user) {
 					if (err !== null) {

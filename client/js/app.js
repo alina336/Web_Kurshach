@@ -1,10 +1,10 @@
-var organizeByTags = function (toDoObjects) { 
+var organizeByTags = function (mealObjects) { 
 	// создание пустого массива для тегов
 	var tags = [];
-	// перебираем все задачи toDos 
-	toDoObjects.forEach(function (toDo) {
+	// перебираем все задачи meals 
+	mealObjects.forEach(function (Receipt) {
 		// перебираем все теги для каждой задачи 
-		toDo.tags.forEach(function (tag) {
+		Receipt.tags.forEach(function (tag) {
 			// убеждаемся, что этого тега еще нет в массиве
 			if (tags.indexOf(tag) === -1) { 
 				tags.push(tag);
@@ -14,80 +14,89 @@ var organizeByTags = function (toDoObjects) {
 	var tagObjects = tags.map(function (tag) {
 		// здесь мы находим все задачи,
 		// содержащие этот тег
-		var toDosWithTag = []; 
-		toDoObjects.forEach(function (toDo) {
+		var mealsWithTag = []; 
+		mealObjects.forEach(function (Receipt) {
 			// проверка, что результат
 			// indexOf is *не* равен -1
-			if (toDo.tags.indexOf(tag) !== -1) { 
-				toDosWithTag.push(toDo.description);
+			if (Receipt.tags.indexOf(tag) !== -1) { 
+				mealsWithTag.push(Receipt.description);
 			}
 		});
 		// мы связываем каждый тег с объектом, который содержит название тега и массив
-		return { "name": tag, "toDos": toDosWithTag };
+		return { "name": tag, "meals": mealsWithTag };
 	});
 	return tagObjects;
 };
 
-var liaWithEditOrDeleteOnClick = function (todo, callback) {
-	var $todoListItem = $("<li>").text(todo.description),
-		$todoEditLink = $("<a>").attr("href", "todos/" + todo._id),
-		$todoRemoveLink = $("<a>").attr("href", "todos/" + todo._id);
+var liaWithEditOrDeleteOnClick = function (Receipt, callback) {
+	var $mealListItem = $("<li>").text(Receipt.description),
+		$mealEditLink = $("<a>").attr("href", "meals/" + Receipt._id),
+		$mealRemoveLink = $("<a>").attr("href", "meals/" + Receipt._id);
 
-	$todoEditLink.addClass("linkEdit");
-	$todoRemoveLink.addClass("linkRemove");
+	$mealEditLink.addClass("linkEdit");
+	$mealRemoveLink.addClass("linkRemove");
 
-	$todoRemoveLink.text("Удалить");
-	$todoRemoveLink.on("click", function () {
-		$.ajax({
-			url: "/todos/" + todo._id,
-			type: "DELETE"
-		}).done(function (responde) {
-			callback();
-		}).fail(function (err) {
-			console.log("Произошла ошибка: " + err.textStatus);
-		});
-		return false;
-	});
-	$todoListItem.append($todoRemoveLink);
-
-	$todoEditLink.text("Редактировать");
-	$todoEditLink.on("click", function() {
-		var newDescription = prompt("Введите новое наименование для задачи", todo.description);
-		if (newDescription !== null && newDescription.trim() !== "") {
-			$.ajax({
-				"url": "/todos/" + todo._id,
-				"type": "PUT",
-				"data": { "description": newDescription },
-			}).done(function (responde) {
-				callback();
-			}).fail(function (err) {
-				console.log("Произошла ошибка: " + err.val);
-			});
+		if (Receipt.status === 'Есть в меню') {
+			$mealEditLink.text("Убрать из меню");
+			$mealEditLink.on("click", function() {
+				var newDescription = Receipt.description + " [Сегодня не в меню]";
+				if (newDescription !== null && newDescription.trim() !== "") {
+					$.ajax({
+						"url": "/meals/" + Receipt._id,
+						"type": "PUT",
+						"data": { "description": newDescription, "status": 'Сегодня не в меню' },
+					}).done(function (responde) {
+						Receipt.status = 'Сегодня не в меню';
+						callback();
+					}).fail(function (err) {
+						console.log("Произошла ошибка: " + err);
+					});
+				}
+	
+				return false;
+			});	
+			$mealListItem.append($mealEditLink); 
 		}
-		return false;
-	});
-	$todoListItem.append($todoEditLink);
+		else {
+			$mealRemoveLink.text("Удалить");
+			$mealRemoveLink.on("click", function () {
+				$.ajax({
+					url: "/meals/" + Receipt._id,
+					type: "DELETE"
+				}).done(function (responde) {
+					callback();
+				}).fail(function (err) {
+					console.log("Произошла ошибка: " + err.textStatus);
+				});
+				return false;
+			});
+			$mealListItem.append($mealRemoveLink);
+		}
 
-	return $todoListItem;
+	return $mealListItem;
 }
 
-var main = function (toDoObjects) {
+var main = function (mealObjects) {
 	"use strict";
 	// создание пустого массива с вкладками
 	var tabs = [];
-	// добавляем вкладку Новые
+	// добавляем вкладку Меню
 	tabs.push({
-		"name": "Новые",
-		// создаем функцию content
-		// так, что она принимает обратный вызов
+		"name": "Меню",
 		"content": function(callback) {
-			$.getJSON("todos.json", function (toDoObjects) {
+			$.getJSON("meals.json", function (mealObjects) {
 				var $content = $("<ul>");
-				for (var i = toDoObjects.length-1; i>=0; i--) {
-					var $todoListItem = liaWithEditOrDeleteOnClick(toDoObjects[i], function() {
+				for (var i = mealObjects.length-1; i>=0; i--) {
+					var $mealListItem = liaWithEditOrDeleteOnClick(mealObjects[i], function() {
 						$(".tabs a:first-child span").trigger("click");
 					});
-					$content.append($todoListItem);
+					var $text = $("<p>").text("");
+					var $ingredients = $("<li>").text("Состав: " + mealObjects[i].tags);
+					var $price = $("<li>").text("Цена: " + mealObjects[i].price + " рублей");
+					$content.append($text);
+					$content.append($mealListItem);
+					$content.append($ingredients);
+					$content.append($price);
 				}
 				callback(null, $content);
 			}).fail(function (jqXHR, textStatus, error) {
@@ -96,19 +105,27 @@ var main = function (toDoObjects) {
 		}
 	});
 
-	// добавляем вкладку Старые
+	// добавляем вкладку Сегодня в меню
 	tabs.push({
-		"name": "Старые",
+		"name": "Есть в меню",
 		"content": function(callback) {
-			$.getJSON("todos.json", function (toDoObjects) {
+			$.getJSON("meals.json", function (mealObjects) {
 				var $content,
 					i;
 				$content = $("<ul>");
-				for (i = 0; i < toDoObjects.length; i++) {
-					var $todoListItem = liaWithEditOrDeleteOnClick(toDoObjects[i], function() {
-						$(".tabs a:nth-child(2) span").trigger("click");
-					});
-					$content.append($todoListItem);
+				for (i = 0; i < mealObjects.length; i++) {
+					if (mealObjects[i].status === 'Есть в меню') {
+						var $mealListItem = liaWithEditOrDeleteOnClick(mealObjects[i], function() {
+							$(".tabs a:nth-child(2) span").trigger("click");
+						});
+						var $text = $("<p>").text("");
+						var $ingredients = $("<li>").text("Состав: " + mealObjects[i].tags);
+						var $price = $("<li>").text("Цена: " + mealObjects[i].price + " рублей");
+						$content.append($text);
+						$content.append($mealListItem);
+						$content.append($ingredients);
+						$content.append($price);
+					}
 				}
 				callback(null, $content);
 			}).fail(function(jqXHR, textStatus, error) {
@@ -117,18 +134,18 @@ var main = function (toDoObjects) {
 		}
 	});
 
-	// добавляем вкладку Теги
+	// добавляем вкладку Поиск по ингредиентам
 	tabs.push({
-		"name": "Теги",
+		"name": "Ингредиенты",
 		"content":function (callback) {
-			$.get("todos.json", function (toDoObjects) {	
+			$.get("meals.json", function (mealObjects) {	
 				// создание $content для Теги 
-				var organizedByTag = organizeByTags(toDoObjects),
+				var organizedByTag = organizeByTags(mealObjects),
 					$content;
 				organizedByTag.forEach(function (tag) {
 					var $tagName = $("<h3>").text(tag.name);
 						$content = $("<ul>");
-					tag.toDos.forEach(function (description) {
+					tag.meals.forEach(function (description) {
 						var $li = $("<li>").text(description);
 						$content.append($li);
 					});
@@ -147,32 +164,40 @@ var main = function (toDoObjects) {
 	tabs.push({
 		"name": "Добавить",
 		"content":function () {
-			$.get("todos.json", function (toDoObjects) {	
+			$.get("meals.json", function (mealObjects) {	
 				// создание $content для Добавить 
-				var $textInput = $("<h3>").text("Введите новую задачу: "),
+				var $textInput = $("<h3>").text("Введите новое блюдо: "),
 					$input = $("<input>").addClass("description"), 
-					$textTag = $("<h3>").text("Тэги: "),
+					$textTag = $("<h3>").text("Введите ингредиенты: "),
 					$tagInput = $("<input>").addClass("tags"),
+					$textPrice = $("<h3>").text("Введите стоимость (в рублях): "),
+					$priceInput = $("<input>").addClass("price"),
 					$button = $("<button>").text("Добавить"),
-					$content1 = $("<ul>"), $content2 = $("<ul>");
+					$content1 = $("<ul>"), $content2 = $("<ul>"), $content3 = $("<ul>");
 
 				$content1.append($input);
 				$content2.append($tagInput);
+				$content3.append($priceInput);
 
 				$("main .content").append($textInput);
 				$("main .content").append($content1);
 				$("main .content").append($textTag);
 				$("main .content").append($content2);
+				$("main .content").append($textPrice);
+				$("main .content").append($content3);
 				$("main .content").append($button); 
 				
 				function btnfunc() {
 					var description = $input.val(),
 						tags = $tagInput.val().split(","),
+						price = $priceInput.val(),
 						// создаем новый элемент списка задач
-						newToDo = {"description":description, "tags":tags};
-					$.post("todos", newToDo, function(result) {
+						newMeal = {"description":description, "tags":tags, "status": 'Есть в меню', "price": price};
+						// newReceipt = {"description":description, "phone":phone, "status": 'Открыто'};
+					$.post("meals", newMeal, function(result) {
 						$input.val("");
 						$tagInput.val("");
+						$priceInput.val("");
 						$(".tabs a:first-child span").trigger("click");
 					});
 				}
@@ -214,7 +239,12 @@ var main = function (toDoObjects) {
 }
 
 $(document).ready(function() {
-	$.getJSON("todos.json", function (toDoObjects) {
-		main(toDoObjects);
+	$.getJSON("meals.json", function (mealObjects) {
+		main(mealObjects);
+		var username = Cookies.get('CurrentUser'); // => "value"
+
+		var $place = $("<p>").text("Здравствуйте, " + username);
+		$("header .username").append($place);
+		console.log(username);
 	});
 });
