@@ -240,11 +240,10 @@ var main = function (mealObjects) {
 
 $(document).ready(function() {
 	$.getJSON("meals.json", function (mealObjects) {
-		main(mealObjects);
 		var username = Cookies.get('CurrentUser'); // => "value"
-
 		var $place = $("<p>").text("Здравствуйте, " + username);
 		$("header .username").append($place);
 		console.log(username);
+		main(mealObjects);
 	});
 });

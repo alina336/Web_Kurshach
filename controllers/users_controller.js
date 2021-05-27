@@ -23,7 +23,11 @@ UsersController.show = function(req, res) {
 		if (err) {
 			console.log(err);
 		} else if (result.length !== 0) {
-			res.sendfile('./client/list.html');
+			if (req.params.username == "admin") {
+				res.sendfile('./client/admin.html');
+			} else {
+				res.sendfile('./client/list.html');
+			}
 		} else {
 		  res.send(404);
 		}
